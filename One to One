@@ -1,0 +1,210 @@
+Instructor      ----------         Instructor Detail
+ id                                        id
+first_name                                 youtube_channel
+last_naem                                  hobby
+email                                    
+instructor_detail_id                                   
+                                    
+
+So to link these table right, we hv to use foreign keys
+instructor_detail_id  (foreign key) ---- id(primary key)
+Foreign key ensures refrential integrity .
+
+/**********************************************************UNIDIRECTIONAL: WE CAN LOAD INSTRUCTOR AND THEN GET ASSOCIATED INSTRUCTOR DETAIL********************/ 
+/*********************************************************************WE CAN LOAD INSTRUCTOR DETAIL BUTTTTT CAN'T GET ASSOCIATED INSTRUCTOR ALSO ************/
+
+@Entity
+@Table(name="instructor")
+class Instructor{
+ @Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name="id")
+	private int id;
+	
+	@Column(name="first_name")
+	private String firstName;
+	
+	@Column(name="last_name")
+	private String lastName;
+
+	@Column(name="email")
+	private String email;
+	
+	@OneToOne(cascade=CascadeType.ALL)           INSTRUCTOR -------> INSTRUCTOR_DETAIL     WE DELETE,SAVE,ETC INSTRUCTOR IT WILL ALSO DELETE,SAVE INSTRUCTOR_DETAIL
+	@JoinColumn(name="instructor_detail_id")    //FOREIGN KEY
+	private InstructorDetail instructorDetail;
+	
+	public Instructor() {
+		
+	}
+
+	public Instructor(String firstName, String lastName, String email) {
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+	}
+ //getter setters
+}
+
+
+
+@Entity
+@Table(name="instructor_detail")
+public class InstructorDetail {
+
+	// annotate the class as an entity and map to db table
+	
+	// define the fields
+	
+	// annotate the fields with db column names
+	
+	// create constructors
+	
+	// generate getter/setter methods
+	
+	// generate toString() method
+	
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name="id")
+	private int id;
+	
+	@Column(name="youtube_channel")
+	private String youtubeChannel;
+	
+	@Column(name="hobby")
+	private String hobby;
+	
+	public InstructorDetail() {
+		
+	}
+  //GETER SETTER
+}
+
+
+public class CreateDemo {
+
+	public static void main(String[] args) {
+
+		// create session factory
+		SessionFactory factory = new Configuration()
+								.configure("hibernate.cfg.xml")
+								.addAnnotatedClass(Instructor.class)
+								.addAnnotatedClass(InstructorDetail.class)
+								.buildSessionFactory();
+		
+		// create session
+		Session session = factory.getCurrentSession();
+		
+		try {			
+			
+			// create the objects
+			
+			Instructor tempInstructor = 
+					new Instructor("Chad", "Darby", "darby@luv2code.com");
+			
+			InstructorDetail tempInstructorDetail =
+					new InstructorDetail(
+							"http://www.luv2code.com/youtube",
+							"Luv 2 code!!!");		
+			
+			
+			
+			
+			// associate the objects
+			tempInstructor.setInstructorDetail(tempInstructorDetail);
+			
+			// start a transaction
+			session.beginTransaction();
+			
+			// save the instructor
+			//
+			// Note: this will ALSO save the details object
+			// because of CascadeType.ALL
+			//
+			System.out.println("Saving instructor: " + tempInstructor);
+			session.save(tempInstructor);					
+			
+			// commit transaction
+			session.getTransaction().commit();
+			
+			System.out.println("Done!");
+		}
+		finally {
+			factory.close();
+		}
+	}
+
+}
+
+
+
+public class DeleteDemo {
+
+	public static void main(String[] args) {
+
+		// create session factory
+		SessionFactory factory = new Configuration()
+								.configure("hibernate.cfg.xml")
+								.addAnnotatedClass(Instructor.class)
+								.addAnnotatedClass(InstructorDetail.class)
+								.buildSessionFactory();
+		
+		// create session
+		Session session = factory.getCurrentSession();
+		
+		try {			
+			
+			// start a transaction
+			session.beginTransaction();
+
+			// get instructor by primary key / id
+			int theId = 1;
+			Instructor tempInstructor = 
+					session.get(Instructor.class, theId);
+			
+			System.out.println("Found instructor: " + tempInstructor);
+			
+			// delete the instructors
+			if (tempInstructor != null) {
+			
+				System.out.println("Deleting: " + tempInstructor);
+				
+				// Note: will ALSO delete associated "details" object
+				// because of CascadeType.ALL
+				//
+				session.delete(tempInstructor);				
+			}
+			
+			// commit transaction
+			session.getTransaction().commit();
+			
+			System.out.println("Done!");
+		}
+		finally {
+			factory.close();
+		}
+	}
+
+}
+
+
+
+
+/**********************************************************BI DIRECTIONAL: WE CAN LOAD INSTRUCTOR AND THEN GET ASSOCIATED INSTRUCTOR DETAIL
+                                                                          WE CAN LOAD INSTRUCTOR DETAIL AND THEN GET ASSOCIATED INSTRUCTOR ALSO  ********************/ 
+
+
+add in class INSTRUCTOR_DETAIL association to INSTRUCTOR
++
++
++
+{
+@OneToOne (mappedBy="instructor_detail",cascade= {casscadeType.All minus cascadeType.Remove })
+private Instructor instructor
+
+//getset for instructor
+}
+
+//in main class
+tempInstructorDetial.detInstructor will help to get associated instructor
