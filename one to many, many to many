@@ -1,0 +1,47 @@
+Many to one
+      many COURSES can have at most one INSTRUCTOR
+            //bidirectional is best
+            Course class
+                //forign key from course to instructor @JoinColumn
+                //cascade all - remove (don't delete any instructor on deleting course - real world req.)
+            Instructor class
+                //mapped by course class, cascade all- remove  (don't delete any course on deleting instructor - real world req.)
+                List<Course> courses;
+                
+                public void add(Course tempCourse)
+                {
+                    if(courses == null)
+                        courses = new ArrayList();
+                     
+                    courses.add(tempCourse)
+                    tempCourse.setInstructor(this)
+                }
+      
+      many reviews can have one course
+                //unidirectional  depending on real world req.
+                                  load reviews based on course only
+
+
+Many to many
+      one COURSE can have many STUDENTS  //F.K. from student to course (f.k. from many to one)
+      one STUDENT can learn many courses    //F.K. from course to student (f.k. from many to one)
+                //f.k. from both sides alternative instead make a new Table 
+                
+                course_student(couorse_id, student_id) //no Primary key
+                
+                
+                Course class
+                      @ManyToMany
+                      @JoinTable(name=course_student,
+                                  joinColumns=@JoinColumn(name=course_id)
+                                  inverseJoinColumn = @JoinColumn(name=student_id)
+                      private List<Student> students;
+                      
+                Student class
+                      @ManyToMany
+                      @JoinTable(name=course_student,
+                                  joinColumns=@JoinColumn(name=student_id)
+                                  inverseJoinColumn = @JoinColumn(name=course_id)
+                      private List<Student> courses;
+                
+                
